@@ -3,22 +3,20 @@
 
 namespace App\controllers;
 
-use App\services\render\TvigRenderTemplate;
-use App\services\BD;
+use App\services\DB;
+use App\services\TmplRenderService;
+use http\Client\Curl\User;
 
 abstract class Controller implements IController
 {
-    protected $defaultAction = "showAll";
-    protected $defaultTableName = "users";
-    protected $defaultImageUser = "/img/user.png";
+    protected $defaultControllerName = "user";
+    protected $defaultActionName = "default";
     protected static $mainTemplate = "layouts/main";
-    protected $unitData;
-    protected $tableName;
 
     /**
      * @var $data (array) дополнительные параметры, которые необходимо передать для получения html-кода
      */
-    protected $data;
+    protected $data = [];
 
     protected $action;
 
@@ -28,12 +26,11 @@ abstract class Controller implements IController
      * заданному действию и запускает метод
      * @param $action
      */
-    public function run($action, $tableName, $id, $unitData = [])
+    public function run($action, $tableName='', $id =0, $unitData = [])
     {
-        $this->action = $action ?: $this->defaultAction;
-        $this->tableName = $tableName ?: $this->defaultTableName;
-        $this->unitData = $unitData;
-        $this->data = $this->getData();
+        $this->action = $action ?: $this->defaultActionName;
+//        $this->unitData = $unitData;
+//        $this->data = $this->getData();
 
         $method = $this->action . 'Action';
         if (method_exists($this, $method)) {
@@ -41,6 +38,11 @@ abstract class Controller implements IController
         } else {
             echo '404';
         }
+    }
+
+    public function defaultAction(){
+        echo 'default';
+        $this->showAllAction();
     }
 
     /**
@@ -53,7 +55,7 @@ abstract class Controller implements IController
         return [
             'imgSrc' => $this->defaultImageUser,
             'tableName' => $this->tableName,
-            'htmlScripts' => $this->getHTMLScripts()
+//            'htmlScripts' => $this->getHTMLScripts()
         ];
     }
 
@@ -79,7 +81,7 @@ abstract class Controller implements IController
      */
     protected function getClassName()
     {
-        $str = ucfirst($this->tableName);
+        $str = ucfirst($this->getTableName());
         if ($str[mb_strlen($str) - 1] === "s") {
             $str = mb_substr($str, 0, mb_strlen($str) - 1);
         }
@@ -154,8 +156,7 @@ abstract class Controller implements IController
      */
     public function render($params)
     {
-        $params['menuUnits'] = BD::getUnitsAllTables();
-        $render = new TvigRenderTemplate();
+        $render = new TmplRenderService();
         return $render->Render(Controller::$mainTemplate, $params);
     }
 }

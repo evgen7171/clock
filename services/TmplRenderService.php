@@ -6,12 +6,45 @@
  * Time: 22:00
  */
 
-namespace App\services\renders;
+namespace App\services;
 
 
-class TmplRenderServices
+class TmplRenderService
 {
-    public function renderTmpl($template, $params = [])
+    public function Render($template, $params)
+    {
+        extract($params);
+        $arrStr = [
+            'properties',
+            'hideProperties',
+            'imgSrc',
+            'tableName',
+            'htmlScripts'
+        ];
+        $arr = compact($arrStr);
+
+        $menuContent = TmplRenderService::RenderTemplate(
+            "layouts/menu", $params);
+        $params = [
+            'menuContent' => $menuContent
+        ];
+        if (isset($unit)) {
+            $tmpl = 'unit';
+            $data = [
+                'data' => $unit
+            ];
+        } else if (isset($units)) {
+            $tmpl = 'units';
+            $data = [
+                'data' => $units];
+        }
+        $data = array_merge($data, $arr);
+        $params['content'] = TmplRenderService::RenderTemplate($tmpl, $data);
+        extract($params);
+        return TmplRenderService::RenderTemplate($template, $params);
+    }
+
+    public function RenderTemplate($template, $params)
     {
         ob_start();
         extract($params);

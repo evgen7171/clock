@@ -2,23 +2,22 @@
 
 namespace App\models;
 
-use App\services\BD;
-use App\services\IBD;
+use App\services\DB;
 
 abstract class Model
 {
     /**
-     * @var BD Класс для работы с базой данных
+     * @var DB Класс для работы с базой данных
      * @method static User($id)
      */
-    protected $bd;
+    protected $db;
 
     /**
      * Model constructor.
      */
     public function __construct()
     {
-        $this->bd = BD::getInstance();
+        $this->db = DB::getInstance();
         $this->properties = $this->getProperties();
     }
 
@@ -42,7 +41,7 @@ abstract class Model
     {
         $tableName = static::getTableName();
         $sql = "SELECT * FROM {$tableName} WHERE id = :id";
-        return BD::getInstance()->queryObject($sql, get_called_class(), [':id' => $id]);
+        return DB::getInstance()->queryObject($sql, get_called_class(), [':id' => $id]);
     }
 
     /**
@@ -54,7 +53,8 @@ abstract class Model
     {
         $tableName = static::getTableName();
         $sql = "SELECT * FROM {$tableName}";
-        return BD::getInstance()->queryObjects($sql, get_called_class());
+        return DB::getInstance()->queryObjects($sql, get_called_class());
+//        return DB::getInstance()->getAll($sql);
     }
 
     /**
@@ -65,7 +65,7 @@ abstract class Model
     {
         $tableName = static::getTableName();
         $sql = "SELECT * FROM {$tableName}";
-        return BD::getInstance()->getAll($sql);
+        return DB::getInstance()->getAll($sql);
     }
 
     /**
@@ -77,7 +77,7 @@ abstract class Model
     {
         $tableName = static::getTableName();
         $sql = "SELECT * FROM {$tableName} WHERE id=:id";
-        return BD::getInstance()->getOne($sql, [':id' => $id]);
+        return DB::getInstance()->getOne($sql, [':id' => $id]);
     }
 
     /**
@@ -100,8 +100,8 @@ abstract class Model
         $tableName = static::getTableName();
         $sql = "INSERT INTO {$tableName} ({$columnsStr})
                 VALUES ({$placeholders})";
-        $this->bd->execute($sql, $params);
-        $this->id = $this->bd->lastInsertId();
+        $this->db->execute($sql, $params);
+        $this->id = $this->db->lastInsertId();
     }
 
     /*
@@ -111,14 +111,14 @@ abstract class Model
     {
         $tableName = static::getTableName();
         $sql = "DELETE FROM {$tableName} WHERE id={$this->id}";
-        $this->bd->execute($sql, $params);
+        $this->db->execute($sql, $params);
     }
 
     public function deleteOne($id)
     {
         $tableName = static::getTableName();
         $sql = "DELETE FROM {$tableName} WHERE id={$id}";
-        $this->bd->execute($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -136,7 +136,7 @@ abstract class Model
         $keyValueString = implode(', ', $keyValueElems);
         $tableName = static::getTableName();
         $sql = "UPDATE {$tableName} SET {$keyValueString} WHERE id = {$this->id};";
-        $this->bd->execute($sql, $params);
+        $this->db->execute($sql, $params);
     }
 
     /**
@@ -157,7 +157,7 @@ abstract class Model
      */
     public function getProperties()
     {
-        $props = $this->bd->getProperties($this->getTableName());
+        $props = $this->db->getProperties($this->getTableName());
         return $props;
     }
 

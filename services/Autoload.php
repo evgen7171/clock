@@ -6,7 +6,7 @@ class Autoload
     {
         $file = str_replace(
             ['App\\', '\\'],
-            [$_SERVER['DOCUMENT_ROOT'] ."/../", '/'],
+            [$_SERVER['DOCUMENT_ROOT'] ."/", '/'],
             $className
         ). '.php';
         if (file_exists($file)) {

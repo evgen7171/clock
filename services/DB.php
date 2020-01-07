@@ -2,12 +2,10 @@
 
 namespace App\services;
 
-use App\models\Good;
-use App\models\Model;
-use App\models\User;
 use App\traits\TSingleton;
+use PDO;
 
-class BD implements IBD
+class DB implements IDB
 {
     private $config;
 
@@ -17,32 +15,35 @@ class BD implements IBD
      * метод получения конфигурационных данных для подключения к базе данных
      * @return void массив из файла конфигурации
      */
-    protected function getConfig()
+
+    private function getConfig()
     {
-        $this->config = include __DIR__ . '\..\config\config_default.php';
+        $this->config =
+            (include $_SERVER['DOCUMENT_ROOT'] . '/main/config.php')['components']['db']['config'];
     }
 
     /**
      * метод получения имен таблиц из базы данных определенной в файле конфигурации
      * @return array массив имен таблиц базы данных
      */
-    public static function getTableNames()
+    public function getTableNames()
     {
+        $config =
+            (include $_SERVER['DOCUMENT_ROOT'] . '/main/config.php')['components']['db']['config'];
         $result = [];
-        $config = include __DIR__ . '\..\config\config_default.php';
         $dsn = sprintf(
             '%s:host=%s;dbname=%s;charset=%s',
             $config['driver'],
             $config['host'],
-            $config['bd'],
+            $config['db'],
             $config['charset']
         );
-        $connect = new \PDO(
+        $connect = new PDO(
             $dsn,
             $config['user'],
             $config['pass']
         );
-        $sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = '{$config['bd']}'";
+        $sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = '{$config['db']}'";
         $PDOStatement = $connect->prepare($sql);
         $PDOStatement->execute();
         $arr = $PDOStatement->fetchAll();
@@ -63,26 +64,27 @@ class BD implements IBD
     }
 
     /**
-     * @var \PDO|null
+     * @var PDO|null
      */
     protected $connect = null;
 
     /**
      * Возвращает только один коннект с базой - объект PDO
-     * @return \PDO|null
+     * @return PDO|null
      */
     protected function getConnect()
     {
+        $this->config =
+            (include $_SERVER['DOCUMENT_ROOT'] . '/main/config.php')['components']['db']['config'];
         if (empty($this->connect)) {
-            $this->getConfig();
-            $this->connect = new \PDO(
+            $this->connect = new PDO(
                 $this->getDSN(),
                 $this->config['user'],
-                $this->config['pass']
+                $this->config['password']
             );
             $this->connect->setAttribute(
-                \PDO::ATTR_DEFAULT_FETCH_MODE,
-                \PDO::FETCH_ASSOC
+                PDO::ATTR_DEFAULT_FETCH_MODE,
+                PDO::FETCH_ASSOC
             );
         }
         return $this->connect;
@@ -100,7 +102,7 @@ class BD implements IBD
             '%s:host=%s;dbname=%s;charset=%s',
             $this->config['driver'],
             $this->config['host'],
-            $this->config['bd'],
+            $this->config['db'],
             $this->config['charset']
         );
     }
@@ -114,7 +116,8 @@ class BD implements IBD
      */
     private function query($sql, array $params = [])
     {
-        $PDOStatement = $this->getConnect()->prepare($sql);
+        $connect = $this->getConnect();
+        $PDOStatement = $connect->prepare($sql);
         $PDOStatement->execute($params);
         return $PDOStatement;
     }
@@ -130,7 +133,7 @@ class BD implements IBD
     {
         $PDOStatement = $this->query($sql, $params);
         $PDOStatement->setFetchMode(
-            \PDO::FETCH_CLASS,
+            PDO::FETCH_CLASS,
             $class);
         return $PDOStatement->fetch();
     }
@@ -146,7 +149,7 @@ class BD implements IBD
     {
         $PDOStatement = $this->query($sql, $params);
         $PDOStatement->setFetchMode(
-            \PDO::FETCH_CLASS,
+            PDO::FETCH_CLASS,
             $class);
         return $PDOStatement->fetchALL();
     }
@@ -203,7 +206,7 @@ class BD implements IBD
     {
         $result = [];
         $sql = "SHOW COLUMNS FROM {$tableName}";
-        $arr = BD::getInstance()->getAll($sql);
+        $arr = DB::getInstance()->getAll($sql);
         foreach ($arr as $item) {
             $result[] = $item['Field'];
         }
@@ -213,19 +216,17 @@ class BD implements IBD
     /**
      * метод получения всех unit-данных в виде массива
      */
-    public static function getUnitsAllTables()
+    public function getUnitsAllTables()
     {
         $units = [];
-        $tableNames = BD::getTableNames();
+        $tableNames = DB::getTableNames();
         foreach ($tableNames as $tableName) {
-            $ClassNames = BD::getClassFromTableNames($tableName);
-            $prop = BD::getMainProperty($ClassNames['nameFull']);
+            $ClassNames = DB::getClassFromTableNames($tableName);
             $sql = "SELECT * FROM {$tableName}";
-            $arr = BD::getInstance()->getAll($sql);
+            $arr = DB::getInstance()->getAll($sql);
             foreach ($arr as $item) {
                 $units[$tableName][] = [
                     'actionOne' => strtolower($ClassNames['nameShort']),
-                    'prop' => $item[$prop],
                     'id' => $item['id']
                 ];
             }
@@ -234,22 +235,11 @@ class BD implements IBD
     }
 
     /**
-     * метод получения важного свойства
-     * @param $ClassName
-     * @return mixed
-     */
-    public static function getMainProperty($ClassName)
-    {
-        $result = (new $ClassName())->getKeyProperty();
-        return $result;
-    }
-
-    /**
      * метод получения названия класса из имени таблицы из базы данных
      * @param $tableNames
      * @return string
      */
-    public static function getClassFromTableNames($tableNames)
+    public function getClassFromTableNames($tableNames)
     {
         $str = $tableNames;
         if ($str[mb_strlen($str) - 1] === 's') {

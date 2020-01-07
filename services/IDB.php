@@ -1,7 +1,7 @@
 <?php
 namespace App\services;
 
-interface IBD
+interface IDB
 {
     public function find(string $sql, array $params = []);
     public function findAll(string $sql, array $params = []);

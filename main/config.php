@@ -1,26 +1,25 @@
 <?php
 return [
-    'rootName' => $_SERVER['DOCUMENT_ROOT'] .'/../',
-    'name' => 'Мой магазин',
-    'defaultControllerName' => 'good',
+    'rootPath' => $_SERVER['DOCUMENT_ROOT'] . '/',
+    'name' => 'Органайзер',
+    'defaultControllerName' => 'user',
+    'public' => [
+        'css' => [
+            'css/style.css'
+        ]
+    ],
 
     'components' => [
-        'bd' => [
-            'class' => \App\services\BD::class,
+        'db' => [
+            'class' => \App\services\DB::class,
             'config' => [
                 'user' => 'root',
-                'pass' => '',
+                'password' => '',
                 'driver' => 'mysql',
-                'bd' => 'gbphp',
+                'db' => 'clock',
                 'host' => 'localhost:3307',
                 'charset' => 'UTF8',
             ]
-        ],
-        'userRepository' => [
-            'class' => \App\models\repositories\UserRepository::class
-        ],
-        'bookingRepository' => [
-            'class' => \App\models\repositories\BookingRepository::class
         ]
     ],
 ];

@@ -5,8 +5,8 @@
 
 ?>
 <ul>
-    <?php
-    foreach ($menuUnits as $tableNames => $arr) {
+    <?php if($menuUnits):?>
+    <?php foreach ($menuUnits as $tableNames => $arr) {
         ?>
         <li class="menu-list"><a href="?action=showAll&table=<?= $tableNames ?>"><?= $tableNames ?></a>
             <ul class="drop-menu">
@@ -19,4 +19,5 @@
         <?php
     }
     ?>
+    <?php endif;?>
 </ul>

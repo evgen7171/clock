@@ -2,28 +2,57 @@
 
 namespace App\main;
 
-use App\models\repositories\BookingRepository;
-use App\models\repositories\UserRepository;
-use App\services\BD;
+use App\services\DB;
+use App\services\TmplRenderService;
 use App\traits\TSingleton;
 
 /**
  * Class App
  * @package App\main
- * @property BD bd
- * @property UserRepository userRepository
- * @property BookingRepository bookingRepository
+ * @property DB db
  */
 class App
 {
     use TSingleton;
 
-    private $config;
+    private static $config;
     private $componentsData;
     private $components = [];
 
+    public static function getPublicConfig()
+    {
+        return App::$config['public'];
+    }
+
+    public static function getHTMLstyles()
+    {
+        $links = '';
+        $arr = App::getPublicConfig()['css'];
+        if (!$arr) {
+            return;
+        }
+        foreach ($arr as $item) {
+            $links .= '<link rel="stylesheet" href="/' . $item . '">';
+        }
+        return $links;
+    }
+
+    public static function getHTMLscripts()
+    {
+        $scripts = '';
+        $arr = App::getPublicConfig()['js'];
+        if (!$arr) {
+            return;
+        }
+        foreach ($arr as $item) {
+            $scripts .= '<script src="/' . $item . '"></script>';
+        }
+        return $scripts;
+    }
+
     static public function call(): App
     {
+        static::$config = include($_SERVER['DOCUMENT_ROOT'] . '/main/config.php');
         return static::getInstance();
     }
 
@@ -34,10 +63,10 @@ class App
 
     }
 
-    public function run($config)
+    public function run()
     {
-        $this->config = $config;
-        $this->componentsData = $config['components'];
+//        $this->config = $config;
+        $this->componentsData = App::$config['components'];
         $this->runController();
     }
 
@@ -56,19 +85,22 @@ class App
     {
         $request = new \App\services\Request();
 
-        $defaultControllerName = $this->config['defaultControllerName'];
+        $defaultControllerName = static::$config['defaultControllerName'];
+
         $controllerName = $request->getControllerName() ?: $defaultControllerName;
         $actionName = $request->getActionName();
+
+        $params = compact($controllerName, $actionName, $id, $postParams);
 
         $controllerClass = 'App\\controllers\\' .
             ucfirst($controllerName) . 'Controller';
         if (class_exists($controllerClass)) {
             /**@var \App\controllers\Controller $controller */
             $controller = new $controllerClass(
-                new \App\services\renders\TwigRenderServices(),
+                new TmplRenderService(),
                 $request
             );
-            $controller->run($actionName);
+            $controller->run($params);
         }
     }
 
