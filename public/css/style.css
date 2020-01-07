@@ -1,0 +1,97 @@
+a {
+    text-decoration: none;
+    color: #0358e6;
+}
+
+a:hover {
+    color: red;
+}
+
+.menuContent {
+    border: 1px solid #000;
+    display: flex;
+}
+
+.content {
+    background-color: #e6e6e6;
+    padding-left: 1rem;
+    padding-bottom: 2rem;
+    border: 1px solid #000;
+}
+
+.menuContent ul {
+    list-style-type: none;
+    display: flex;
+}
+
+.drop-menu {
+    position: absolute;
+    margin-left: -0.5rem;
+    margin-top: 0.5rem;
+    background-color: #fff;
+}
+
+.menuContent .menu-list {
+    height: 2rem;
+    margin-right: 1rem;
+}
+
+.menuContent li .drop-menu {
+    display: none;
+}
+
+.menuContent li:hover .drop-menu {
+    display: block;
+}
+
+.menuContent li .drop-menu li {
+    margin-left: -2.5rem;
+    margin-bottom: 0.2rem;
+    padding: 0.5rem;
+}
+
+.pic {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 1rem;
+}
+
+.pic img {
+    width: 20px;
+    height: 20px;
+}
+
+.hideButtons {
+    display: none;
+}
+
+#formAdd form {
+    border: 1px solid #000;
+    display: flex;
+}
+
+.addButton {
+    margin-top: 2rem;
+}
+
+.table-header {
+    border-bottom: 1px solid black;
+}
+
+.cellContentEdit {
+    width: 80px;
+}
+
+.table-buttons {
+    display: flex;
+}
+
+.table-buttons a {
+    margin-left: 0.5rem;
+    margin-right: 0.3rem;
+    border: 1px solid #000;
+    padding: 0.2rem;
+    border-radius: 0.5rem;
+}
