@@ -2,13 +2,19 @@
 
 namespace App\controllers;
 
+use App\models\Event;
 use App\models\User;
 use App\services\DB;
 
-class UserController extends Controller
+class EventController extends Controller
 {
     public function getTableName()
     {
-        return "users";
+        return "events";
+    }
+
+    public function getUserEvents($user_id)
+    {
+        return (new Event())->getUserEvents($user_id);
     }
 }

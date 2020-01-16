@@ -1,5 +1,5 @@
 #AddDefaultCharset UTF-8
-#DirectoryIndex index.php index.html
+#DirectoryIndex login.php login.php
 #
 RewriteEngine on
 

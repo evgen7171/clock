@@ -4,7 +4,13 @@
 namespace App\controllers;
 
 
-class Login
+class LoginController extends Controller
 {
+
+    public function getTableName()
+    {
+        // TODO: Implement getTableName() method.
+    }
+
 
 }

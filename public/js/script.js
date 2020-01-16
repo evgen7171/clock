@@ -1,2 +1,1 @@
-let elem = document.getElementById('menu');
-console.log(elem);
+console.log('script---');

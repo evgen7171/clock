@@ -9,38 +9,27 @@
 namespace App\services;
 
 
+use App\models\Event;
+
 class TmplRenderService
 {
     public function Render($template, $params)
     {
-        extract($params);
-        $arrStr = [
-            'properties',
-            'hideProperties',
-            'imgSrc',
-            'tableName',
-            'htmlScripts'
-        ];
-        $arr = compact($arrStr);
-
-        $menuContent = TmplRenderService::RenderTemplate(
-            "layouts/menu", $params);
-        $params = [
-            'menuContent' => $menuContent
-        ];
-        if (isset($unit)) {
-            $tmpl = 'unit';
-            $data = [
-                'data' => $unit
-            ];
-        } else if (isset($units)) {
-            $tmpl = 'units';
-            $data = [
-                'data' => $units];
+        if (empty($params)) {
+            $params = ['content' => null];
+//        } else {
+//            $params['content'] = TmplRenderService::RenderTemplate($tmpl, $data);
+//            $params['content'] = $params['data'];
         }
-        $data = array_merge($data, $arr);
-        $params['content'] = TmplRenderService::RenderTemplate($tmpl, $data);
-        extract($params);
+//        elseif (is_array($params)) {
+//            $params['content'] = $this->RenderArray($params['content']);
+//        }
+        /*
+                $params = [
+                    'menuContent' => TmplRenderService::RenderTemplate("layouts/menu", $params)
+                ];
+                extract($params);
+                */
         return TmplRenderService::RenderTemplate($template, $params);
     }
 
@@ -50,5 +39,14 @@ class TmplRenderService
         extract($params);
         include $_SERVER['DOCUMENT_ROOT'] . '/views/' . $template . '.php';
         return ob_get_clean();
+    }
+
+    public function RenderArray($arr)
+    {
+        $html = '';
+        foreach ($arr as $key => $value) {
+            $html .= '<p>' . $key . ' => ' . $value . '</p>';
+        }
+        return $html;
     }
 }

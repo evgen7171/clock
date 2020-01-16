@@ -32,9 +32,14 @@ class App
             return;
         }
         foreach ($arr as $item) {
-            $links .= '<link rel="stylesheet" href="/' . $item . '">';
+            $links .= '<link rel="stylesheet" href="public/' . $item . '">';
         }
         return $links;
+    }
+
+    public static function getTitle()
+    {
+        return App::$config['title'];
     }
 
     public static function getHTMLscripts()
@@ -45,7 +50,7 @@ class App
             return;
         }
         foreach ($arr as $item) {
-            $scripts .= '<script src="/' . $item . '"></script>';
+            $scripts .= '<script src="public/' . $item . '"></script>';
         }
         return $scripts;
     }
@@ -54,13 +59,6 @@ class App
     {
         static::$config = include($_SERVER['DOCUMENT_ROOT'] . '/main/config.php');
         return static::getInstance();
-    }
-
-    //todo app->auth
-    public function auth()
-    {
-        return (new \App\services\Authorization())->check();
-
     }
 
     public function run()
@@ -133,3 +131,11 @@ class App
         return null;
     }
 }
+
+// todo сделать отображение данных пользователей
+// todo дизайн, представление (заглушка) для отображения информации для пользователя
+// todo завести таблицу в базе данных для каждого пользователя (проверка - сколько пользователейи создание под них таблиц)
+// todo CRUD информации специальной для конкретного пользователя таблицы (для начала admin)
+// todo сделать разные вкладки (игры, информация, органайзер)
+// todo сделть телеграм бота (чтобы отправлять определенные, задаваемы сообщения в телеграм)
+// todo сделать чат (разные люди заходят и могу писать в чат - доступный для всех)

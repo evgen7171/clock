@@ -13,11 +13,13 @@ use App\main\App; ?>
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <?=App::getHTMLstyles()?>
-    <title>Document</title>
+    <title><?=App::getTitle()?></title>
 </head>
 <body>
 <header class="header container">
-    <div class="menuContent"><?= $menuContent ?></div>
+    <?=App::getTitle()?>
+    <hr>
+<!--    <div class="menuContent">--><?//= $menuContent ?><!--</div>-->
 </header>
 <div class="content"><?= $content ?></div>
 <?=App::getHTMLscripts()?>

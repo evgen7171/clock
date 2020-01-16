@@ -18,10 +18,11 @@ use App\main\App;
     <div class="content-center">
         <?= $siteTitle ?>
         <hr>
-        <form action="#" class="form">
+        <form action="user/reg" class="form">
             <input type="text" placeholder="имя">
             <input type="text" placeholder="пароль">
-            <input type="submit" value="войти">
+            <input type="text" placeholder="повторить пароль">
+            <input type="submit" value="отправить">
         </form>
     </div>
 

@@ -3,9 +3,9 @@
 
 namespace App\controllers;
 
-use App\services\DB;
+use App\models\User;
+use App\models\Event;
 use App\services\TmplRenderService;
-use http\Client\Curl\User;
 
 abstract class Controller implements IController
 {
@@ -26,7 +26,7 @@ abstract class Controller implements IController
      * заданному действию и запускает метод
      * @param $action
      */
-    public function run($action, $tableName='', $id =0, $unitData = [])
+    public function run($action, $tableName = '', $id = 0, $unitData = [])
     {
         $this->action = $action ?: $this->defaultActionName;
 //        $this->unitData = $unitData;
@@ -40,9 +40,19 @@ abstract class Controller implements IController
         }
     }
 
-    public function defaultAction(){
-        echo 'default';
-        $this->showAllAction();
+    public function defaultAction()
+    {
+        $events = (new EventController())->getUserEvents(1);
+
+        $this->loginAction();
+//        $this->regAction();
+    }
+
+    public function loginAction(){
+        echo $this->render(['tmpl' => 'forms/login', 'siteTitle'=>'Добро пожаловать!']);
+    }
+    public function regAction(){
+        echo $this->render(['tmpl' => 'forms/reg', 'siteTitle'=>'Регистрция']);
     }
 
     /**
@@ -57,23 +67,6 @@ abstract class Controller implements IController
             'tableName' => $this->tableName,
 //            'htmlScripts' => $this->getHTMLScripts()
         ];
-    }
-
-    /**
-     * метод получения html-скрипта для подключения js-файлов
-     * @return string
-     */
-    public function getHTMLScripts()
-    {
-        $htmlText = '';
-        $scriptNames = scandir(PATCH_JS);
-        foreach ($scriptNames as $fileName) {
-            if ($fileName === '.' || $fileName === '..') {
-                continue;
-            }
-            $htmlText .= "<script src='/js/{$fileName}'></script>";
-        }
-        return $htmlText;
     }
 
     /**
@@ -126,7 +119,7 @@ abstract class Controller implements IController
         $unit = new $ClassName;
         $unit->id = $id;
         $unit->delete();
-        header("Location:index.php?action=showAll");
+        header("Location:login.php?action=showAll");
     }
 
     public function addAction()
@@ -135,18 +128,18 @@ abstract class Controller implements IController
         $unit = new $ClassName;
         var_dump($unit);
         $unit->insert();
-        header("Location:index.php?action=showAll");
+        header("Location:login.php?action=showAll");
     }
 
     public function updateAction()
     {
         $ClassName = $this->getClassName();
         $unit = new $ClassName;
-        foreach ($this->unitData as $prop=>$value){
-            $unit->$prop=$value;
+        foreach ($this->unitData as $prop => $value) {
+            $unit->$prop = $value;
         }
         $unit->update();
-        header("Location:index.php?action=showAll&table={$this->tableName}");
+        header("Location:login.php?action=showAll&table={$this->tableName}");
     }
 
     /**
@@ -154,9 +147,14 @@ abstract class Controller implements IController
      * @param $params
      * @return false|string
      */
-    public function render($params)
+    public function render($params = [])
     {
         $render = new TmplRenderService();
+        if (isset($params['tmpl'])) {
+            $tmpl = $params['tmpl'];
+            unset($params['tmpl']);
+            return $render->Render($tmpl, $params);
+        }
         return $render->Render(Controller::$mainTemplate, $params);
     }
 }

@@ -234,22 +234,4 @@ class DB implements IDB
         return $units;
     }
 
-    /**
-     * метод получения названия класса из имени таблицы из базы данных
-     * @param $tableNames
-     * @return string
-     */
-    public function getClassFromTableNames($tableNames)
-    {
-        $str = $tableNames;
-        if ($str[mb_strlen($str) - 1] === 's') {
-            $str = mb_substr($str, 0, mb_strlen($str) - 1);
-        }
-        $ClassName = ucfirst($str);
-        $ClassNameFull = 'App\\models\\' . $ClassName;
-        return [
-            'nameShort' => $ClassName,
-            'nameFull' => $ClassNameFull
-        ];
-    }
 }

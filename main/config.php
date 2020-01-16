@@ -1,11 +1,14 @@
 <?php
 return [
     'rootPath' => $_SERVER['DOCUMENT_ROOT'] . '/',
-    'name' => 'Органайзер',
+    'title' => 'Органайзер',
     'defaultControllerName' => 'user',
     'public' => [
         'css' => [
             'css/style.css'
+        ],
+        'js' => [
+            'js/script.js'
         ]
     ],
 
@@ -17,7 +20,7 @@ return [
                 'password' => '',
                 'driver' => 'mysql',
                 'db' => 'clock',
-                'host' => 'localhost:3307',
+                'host' => 'localhost:3306',
                 'charset' => 'UTF8',
             ]
         ]
